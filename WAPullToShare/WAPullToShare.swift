@@ -123,7 +123,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
         addSubview(containerView)
     }
     
-    let threshold : CGFloat = 20.0
+    let threshold : CGFloat = 30.0
     var isAnimating = false
 
     func panGestureHandler(gesture: UIPanGestureRecognizer)
@@ -136,7 +136,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
 
             if offsetY <= pullThresholdValue {
                 
-                circleAppear()
+
                 
                 var index = 0
                 var newIndex : Int = -1
@@ -148,9 +148,13 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
                     index++
                 }
                 
-                if iconSelectedIndex == -1 {
-                   iconSelectedIndex = newIndex
+                if iconSelectedIndex == -1 && newIndex != -1{
+                    circleLayer.position = CGPointMake( (icons[newIndex].center.x), icons[newIndex].center.y)
+                    iconSelectedIndex = newIndex
                 }
+                
+                circleAppear()
+
                 
                 //change bezier path shape left /right
                 if !isAnimating && iconSelectedIndex != -1 {
