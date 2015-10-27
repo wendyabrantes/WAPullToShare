@@ -10,6 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    var descriptionImageView = UIImageView()
     var shareScrollView = WAPullToShareScrollView()
     let shape = CAShapeLayer()
     
@@ -35,6 +36,11 @@ class ViewController: UIViewController {
         shareScrollView.containerBackgroundColor = UIColor.blueColor()
         shareScrollView.circleSelectionColor = UIColor.blackColor()
         
+        descriptionImageView.image = UIImage(named: "description")
+        descriptionImageView.contentMode = UIViewContentMode.ScaleAspectFit
+        
+        shareScrollView.addSubview(descriptionImageView)
+        
         view.addSubview(shareScrollView)
     }
     
@@ -45,8 +51,13 @@ class ViewController: UIViewController {
             y:0,
             width: view.bounds.width,
             height:view.bounds.height)
-                
-
+        
+        NSLog("%f", shareScrollView.contentInset.top)
+        descriptionImageView.frame = CGRect(
+            x:0,
+            y: -shareScrollView.contentInset.top,
+            width: shareScrollView.frame.width,
+            height:shareScrollView.frame.height)
     }
     
 

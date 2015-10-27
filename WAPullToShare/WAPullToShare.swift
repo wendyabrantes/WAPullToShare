@@ -45,7 +45,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
     var pullThresholdValue : CGFloat = -60
     
     var circleLayer = CAShapeLayer()
-    var iconSelectedIndex : Int = -1
+    var iconSelectedIndex : Int = 0
     
     //var block selectedItem
     var buttonSelectedCallback:((UIButton, WAPullToShareButtonType) -> Void)?
@@ -83,7 +83,6 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
 
         if !isLayoutSubview {
 
-            contentInset = UIEdgeInsetsMake(-buttonViewHeight, 0, 0, 0)
             containerView.frame.size = CGSize(width: frame.width, height: buttonViewHeight)
             
             var index = 0
@@ -106,6 +105,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
 
         alwaysBounceVertical = true
         
+        contentInset = UIEdgeInsetsMake(-buttonViewHeight, 0, 0, 0)
         circleLayer.anchorPoint = CGPointMake(0.5, 0.5)
         circleLayer.frame = CGRectMake(0, 0, circleSize, circleSize)
         
