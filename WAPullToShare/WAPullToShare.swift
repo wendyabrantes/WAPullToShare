@@ -66,7 +66,6 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
     func addShareIcons(iconTypes: [WAPullToShareButtonType]){
 
         icons = []
-        
         for iconType in iconTypes {
             let btn = UIButton()
             btn.tag = iconType.hashValue
@@ -89,7 +88,6 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
             
             var index = 0
             let btnWidth = containerView.frame.width / CGFloat(icons.count)
-            circleLayer.frame = CGRectMake(icons[0].center.x - circleSize/2 , icons[0].center.y - circleSize/2, circleSize, circleSize)
             for btn in icons {
                 btn.frame =  CGRect(
                     x: CGFloat(index)*btnWidth,
@@ -109,7 +107,8 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
         alwaysBounceVertical = true
         
         circleLayer.anchorPoint = CGPointMake(0.5, 0.5)
-
+        circleLayer.frame = CGRectMake(0, 0, circleSize, circleSize)
+        
         circleLayer.path = circleCurrentPath().CGPath
         circleLayer.fillColor = circleSelectionColor.CGColor
         circleLayer.zPosition = -1
@@ -163,7 +162,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
                     rightOffset = min(rightOffset, threshold)
                     
                     circleLayer.path = circleCurrentPath().CGPath
-                    circleLayer.position = CGPointMake( (icons[iconSelectedIndex].center.x) + leftOffset/8 + rightOffset/8, circleLayer.position.y)
+                    circleLayer.position = CGPointMake( (icons[iconSelectedIndex].center.x) + leftOffset/4 + rightOffset/4, circleLayer.position.y)
 
                 }
                 
@@ -180,6 +179,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
                     }
                 }
             }else{
+                resetPanGestureTranslation()
                 deselectItem()
             }
         }
@@ -224,6 +224,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
         groupAnimation.duration = 0.3
         groupAnimation.animations = [layerAnimation, pathAnimation]
         groupAnimation.delegate = self
+        groupAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
         circleLayer.addAnimation(groupAnimation, forKey: "selectedIndex")
     }
     
@@ -234,19 +235,28 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
 
         self.rightOffset = 0
         self.leftOffset = 0
+        resetPanGestureTranslation()
+        isAnimating = false
+    }
+    
+    func resetPanGestureTranslation(){
         let translation = panGestureRecognizer.translationInView(self)
         panGestureRecognizer.setTranslation(CGPointMake(0, translation.y), inView: self)
-        isAnimating = false
     }
     
     func circleCurrentPath() -> UIBezierPath {
         
-        //default
         leftPoint = CGPoint(x: leftOffset, y: circleSize/2)
-        topPoint = CGPoint(x: circleSize/2, y: 0)
         rightPoint = CGPoint(x: circleSize+rightOffset, y: circleSize/2)
-        bottomPoint = CGPoint(x: circleSize/2, y: circleSize)
-        
+        //direction left right
+        if fabs(leftOffset) > fabs(rightOffset){
+            topPoint = CGPoint(x: circleSize/2 + rightOffset, y: 0)
+            bottomPoint = CGPoint(x: circleSize/2 + rightOffset, y: circleSize)
+        }else{
+            topPoint = CGPoint(x: circleSize/2 + leftOffset, y: 0)
+            bottomPoint = CGPoint(x: circleSize/2 + leftOffset, y: circleSize)
+        }
+    
         //control point
         let controlPointLeft : CGFloat = topPoint.x - leftPoint.x
         let controlPointRight : CGFloat = rightPoint.x - topPoint.x
@@ -300,7 +310,6 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
         if iconSelectedIndex != -1 && buttonSelectedCallback != nil {
 
             buttonSelectedCallback!( icons[iconSelectedIndex], WAPullToShareButtonType(rawValue: icons[iconSelectedIndex].tag)!)
-            
         }
     }
     
