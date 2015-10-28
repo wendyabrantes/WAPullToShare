@@ -126,6 +126,10 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
     let threshold : CGFloat = 30.0
     var isAnimating = false
 
+    
+
+
+    
     func panGestureHandler(gesture: UIPanGestureRecognizer)
     {
         let location = gesture.locationInView(self)
@@ -135,11 +139,10 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
         if gesture.state == UIGestureRecognizerState.Began || gesture.state == UIGestureRecognizerState.Changed {
 
             if offsetY <= pullThresholdValue {
-                
 
-                
                 var index = 0
                 var newIndex : Int = -1
+                
                 for btn in icons {
                     
                     if CGRectContainsPoint(btn.frame, CGPoint(x: location.x, y: btn.frame.origin.y)) {
@@ -159,19 +162,25 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
                 //change bezier path shape left /right
                 if !isAnimating && iconSelectedIndex != -1 {
                     
-                    leftOffset = min(translation.x/2,0)
+                    //25px pan before deforming
+                    
+                    leftOffset = min((translation.x+30)/2,0)
                     leftOffset = max(leftOffset, -threshold)
                     
-                    rightOffset = max(translation.x/2,0)
+                    rightOffset = max((translation.x-30)/2,0)
                     rightOffset = min(rightOffset, threshold)
                     
                     circleLayer.path = circleCurrentPath().CGPath
-                    circleLayer.position = CGPointMake( (icons[iconSelectedIndex].center.x) + leftOffset/4 + rightOffset/4, circleLayer.position.y)
+                    circleLayer.position = CGPointMake( (icons[iconSelectedIndex].center.x) + leftOffset/5 + rightOffset/5, circleLayer.position.y)
 
                 }
                 
+                NSLog("%f - %f", leftOffset, rightOffset)
+                
                 //animate to new selected item
-                if !isAnimating && (translation.x > threshold || translation.x < -threshold){
+                //delay error margin
+                
+                if !isAnimating && (rightOffset >= threshold || leftOffset <= -threshold){
                    
                     if newIndex != iconSelectedIndex {
                         NSLog("animated trigger")
@@ -182,6 +191,8 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
                         animateToIndex()
                     }
                 }
+                
+                //
             }else{
                 resetPanGestureTranslation()
                 deselectItem()
@@ -228,7 +239,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
         groupAnimation.duration = 0.3
         groupAnimation.animations = [layerAnimation, pathAnimation]
         groupAnimation.delegate = self
-        groupAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+        groupAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
         circleLayer.addAnimation(groupAnimation, forKey: "selectedIndex")
     }
     
@@ -290,7 +301,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
         //left
         path.addCurveToPoint(
             leftPoint,
-            controlPoint1: CGPoint(x: bottomPoint.x - (controlPointRight/2), y: bottomPoint.y ),
+            controlPoint1: CGPoint(x: bottomPoint.x - (controlPointLeft/2), y: bottomPoint.y ),
             controlPoint2: CGPoint(x: leftPoint.x, y: leftPoint.y + (controlPointLeft/2)))
 
         path.closePath()
@@ -309,6 +320,8 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
     
     func selectItem(){
         let transform = circleLayer.transform
+        
+        
         circleLayer.transform = CATransform3DScale(transform, 10.0, 10.0, 0.0)
 
         if iconSelectedIndex != -1 && buttonSelectedCallback != nil {
