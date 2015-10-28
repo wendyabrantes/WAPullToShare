@@ -26,7 +26,6 @@ enum WAPullToShareButtonType : Int{
             return WAPullToShareStyleKit.imageOfFacebook
         }
     }
-
 }
 
 public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
@@ -126,10 +125,6 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
     let threshold : CGFloat = 30.0
     var isAnimating = false
 
-    
-
-
-    
     func panGestureHandler(gesture: UIPanGestureRecognizer)
     {
         let location = gesture.locationInView(self)
@@ -175,11 +170,7 @@ public class WAPullToShareScrollView : UIScrollView, UIScrollViewDelegate {
 
                 }
                 
-                NSLog("%f - %f", leftOffset, rightOffset)
-                
-                //animate to new selected item
-                //delay error margin
-                
+                //only after
                 if !isAnimating && (rightOffset >= threshold || leftOffset <= -threshold){
                    
                     if newIndex != iconSelectedIndex {
